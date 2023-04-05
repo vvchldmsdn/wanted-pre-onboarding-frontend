@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import './signup.css';
@@ -44,6 +44,14 @@ function SignIn() {
       })
       .catch(err => console.log(err))
   }
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      navigate('/todo')
+    }
+  }, [navigate])
 
   return (
     <div className='signup'>

@@ -56,6 +56,14 @@ function SignUp() {
     }
   }, [email, password])
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      navigate('/todo')
+    }
+  }, [navigate])
+
   return (
     <div className='signup'>
       <div className='email-signup'>
