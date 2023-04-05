@@ -1,9 +1,12 @@
 import React, {useEffect, useState} from 'react';
+import { useNavigate } from 'react-router-dom';
 import './signup.css'
 import Toast from 'react-bootstrap/Toast';
 import axios from "axios";
 
 function SignUp() {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [disabled, setDisabled] = useState(true);
@@ -12,16 +15,17 @@ function SignUp() {
   const handleEmailChange = (e) => {
     const newEmail = e.target.value;
     setEmail(newEmail);
-  }
+  };
 
   const handlePasswordChange = (e) => {
     const newPassword = e.target.value;
     setPassword(newPassword);
-  }
+  };
 
   const handleSingupButtonClick = () => {
     console.log('email', email)
     console.log('password', password)
+
     const data = {
       email: email,
       password: password
@@ -33,9 +37,14 @@ function SignUp() {
         'Content-Type': 'application/json'
       }
     })
-      .then(res => console.log(res))
+      .then(res => {
+        if (res.status === 201) {
+          navigate('/signin')
+        }
+        console.log(res)
+      })
       .catch(err => console.log(err))
-  }
+  };
 
   useEffect(() => {
     if (email.includes('@') && password.length >= 8) {
@@ -69,6 +78,7 @@ function SignUp() {
       </div>
       <div className='button-signup'>
         <button type="button" class="btn btn-outline-dark"
+          data-testid="signup-button"
           disabled={disabled}
           onClick={handleSingupButtonClick}
         >회원가입</button>
