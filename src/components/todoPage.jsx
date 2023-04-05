@@ -1,5 +1,6 @@
 import React, { useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
+import './todo.css'
 
 function TodoPage() {
   const navigate = useNavigate();
@@ -17,6 +18,12 @@ function TodoPage() {
       setTodos([...todos, newTodo]);
       setNewTodo('');
     }
+  }
+
+  const handleDeleteClick = (idx) => {
+    const tmpTodos = todos.slice();
+    tmpTodos.splice(idx, 1);
+    setTodos(tmpTodos);
   }
 
   useEffect(() => {
@@ -39,7 +46,7 @@ function TodoPage() {
 
 
   return (
-    <div>
+    <div className='todo-wrap'>
       <input data-testid="new-todo-input"
         value={newTodo}
         onChange={handleNewtodoChange}
@@ -47,13 +54,21 @@ function TodoPage() {
       <button data-testid="new-todo-add-button"
         onClick={handleSetTodos}
       >추가</button>
-      {todos.map((todo, index) => (
-        <label key={index}>
-          <input type="checkbox"/>
-          <span>{todo}</span>
-        </label>
-      ))}
-    </div>
+      <div className='todo-list'>
+        {todos.map((todo, index) => (
+          <div key={index}>
+            <label>
+              <input type="checkbox"/>
+              <span className='todo-span'>{todo}</span>
+            </label>
+            <button data-testid="modify-button">수정</button>
+            <button data-testid="delete-button"
+              onClick={() => handleDeleteClick(index)}
+            >삭제</button>
+          </div>
+        ))}
+      </div>
+    </div> 
   );
 }
 
