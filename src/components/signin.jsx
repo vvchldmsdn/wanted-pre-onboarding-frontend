@@ -75,6 +75,7 @@ function SignIn() {
       </div>
       <div className='button-signup'>
         <button type="button" class="btn btn-outline-dark"
+          data-testid="signin-button"
           onClick={handleLoginButtonClick}
         >Login</button>
       </div>
