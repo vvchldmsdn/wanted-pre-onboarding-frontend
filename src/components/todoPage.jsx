@@ -8,11 +8,13 @@ function TodoPage() {
 
   const [newTodo, setNewTodo] = useState('');
   const [todos, setTodos] = useState(JSON.parse(localStorage.getItem('todos')) || []);
+  const [isEditing, setIsEditing] = useState(-1);
+  const [editingValue, setEditingValue] = useState('');
 
   const handleNewtodoChange = (e) => {
     const todo = e.target.value;
     setNewTodo(todo);
-  }
+  };
 
   const handleSetTodos = () => {
     if (newTodo.trim() !== '') {
@@ -43,7 +45,7 @@ function TodoPage() {
           setNewTodo('')
         })
     }
-  }
+  };
 
   const handleDeleteClick = (idx, dbId) => {
     const tmpTodos = todos.slice();
@@ -61,7 +63,7 @@ function TodoPage() {
       .then(res => {
         console.log(res)
       })
-  }
+  };
 
   const handleCheckboxClick = (idx, dbId) => {
     const tmpTodos = todos.slice();
@@ -85,8 +87,38 @@ function TodoPage() {
       .then(res => {
         console.log(res)
       })
-  }
+  };
 
+  const handleEditClick = (idx) => {
+    setEditingValue(todos[idx].todo)
+    setIsEditing(idx);
+  };
+
+  const handleEditSubmit = (idx, dbId) => {
+    const token = localStorage.getItem('token');
+    const url = `https://www.pre-onboarding-selection-task.shop/todos/${dbId}`;
+    const data = {
+      todo: editingValue,
+      isCompleted: todos[idx].isCompleted
+    }
+
+    axios.put(url, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(res => {
+        console.log(res)
+      })
+    
+    const tmpTodos = todos.slice();
+    tmpTodos[idx].todo = editingValue;
+    setTodos(tmpTodos)
+    setIsEditing(-1);
+  };
+
+  // 토큰이 없으면 로그인 페이지로
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -94,6 +126,7 @@ function TodoPage() {
     }
   }, [navigate])
 
+  // todos가 바뀌면 localStorage업데이트
   useEffect(() => {
     localStorage.setItem('todos', JSON.stringify(todos));
   }, [todos]);
@@ -126,14 +159,42 @@ function TodoPage() {
       <div className='todo-list'>
         {todos.map((todo, index) => (
           <div key={index}>
-            <label>
-              <input type="checkbox" checked={todo.isCompleted} onChange={() => handleCheckboxClick(index, todo.id)}/>
-              <span className='todo-span'>{todo.todo}</span>
-            </label>
-            <button data-testid="modify-button">수정</button>
-            <button data-testid="delete-button"
-              onClick={() => handleDeleteClick(index, todo.id)}
-            >삭제</button>
+            {isEditing === index ? (
+              <div>
+                <label>
+                  <input type="checkbox" checked={todo.isCompleted} onChange={() => handleCheckboxClick(index, todo.id)}/>
+                  <input
+                    data-testid="modify-input"
+                    type="text"
+                    className='todo-edit'
+                    value={editingValue}
+                    onChange={(e) => setEditingValue(e.target.value)}
+                  ></input>
+                </label>
+                <button 
+                  data-testid="modify-button"
+                  onClick={() => handleEditSubmit(index, todo.id)}  
+                >제출</button>
+                <button 
+                  data-testid="delete-button"
+                  onClick={() => setIsEditing(-1)}
+                >취소</button>
+              </div>
+            ) : (
+              <div>
+                <label>
+                  <input type="checkbox" checked={todo.isCompleted} onChange={() => handleCheckboxClick(index, todo.id)}/>
+                  <span className='todo-span'>{todo.todo}</span>
+                </label>
+                <button 
+                  data-testid="modify-button"
+                  onClick={() => handleEditClick(index)}  
+                >수정</button>
+                <button data-testid="delete-button"
+                  onClick={() => handleDeleteClick(index, todo.id)}
+                >삭제</button>
+              </div>
+            )}
           </div>
         ))}
       </div>
