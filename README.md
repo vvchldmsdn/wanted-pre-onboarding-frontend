@@ -6,3 +6,4 @@
 
 # 데모 영상
 ## 배포 링크로 대체하겠습니다.
+* https://totorotodo.netlify.app
