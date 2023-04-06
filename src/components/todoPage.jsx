@@ -16,23 +16,6 @@ function TodoPage() {
 
   const handleSetTodos = () => {
     if (newTodo.trim() !== '') {
-      // setTodos([...todos, newTodo]);
-
-      // const data = {
-      //   todo: newTodo
-      // };
-      // const url = 'https://www.pre-onboarding-selection-task.shop/todos'
-
-      // axios.post(url, data, {
-      //   headers: {
-      //     'Content-Type': 'application/json'
-      //   }
-      // })
-      //   .then(res => {
-
-      //   })
-  
-      // setNewTodo('');
       const token = localStorage.getItem('token');
       const data = {
         todo: newTodo
@@ -62,17 +45,46 @@ function TodoPage() {
     }
   }
 
-  const handleDeleteClick = (idx) => {
+  const handleDeleteClick = (idx, dbId) => {
     const tmpTodos = todos.slice();
     tmpTodos.splice(idx, 1);
     setTodos(tmpTodos);
+
+    const token = localStorage.getItem('token');
+    const url = `https://www.pre-onboarding-selection-task.shop/todos/${dbId}`;
+
+    axios.delete(url, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then(res => {
+        console.log(res)
+      })
   }
 
-  const handleCheckboxClick = (idx) => {
+  const handleCheckboxClick = (idx, dbId) => {
     const tmpTodos = todos.slice();
     const tmpIsCompleted = tmpTodos[idx].isCompleted
     tmpTodos[idx].isCompleted = !tmpIsCompleted
     setTodos(tmpTodos)
+
+    const token = localStorage.getItem('token');
+    const url = `https://www.pre-onboarding-selection-task.shop/todos/${dbId}`;
+    const data = {
+      todo: tmpTodos[idx].todo,
+      isCompleted: tmpTodos[idx].isCompleted
+    }
+
+    axios.put(url, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(res => {
+        console.log(res)
+      })
   }
 
   useEffect(() => {
@@ -83,15 +95,23 @@ function TodoPage() {
   }, [navigate])
 
   useEffect(() => {
-    const getTodo = JSON.parse(localStorage.getItem('todos'));
-    if (getTodo) {
-      setTodos(getTodo);
-    }
-  }, []);
-
-  useEffect(() => {
     localStorage.setItem('todos', JSON.stringify(todos));
   }, [todos]);
+
+  // todo데이터 DB에서 받아오기, 한번만
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const url = 'https://www.pre-onboarding-selection-task.shop/todos';
+
+    axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then(res => {
+        setTodos(res.data);
+      })
+  }, []);
 
 
   return (
@@ -107,12 +127,12 @@ function TodoPage() {
         {todos.map((todo, index) => (
           <div key={index}>
             <label>
-              <input type="checkbox" checked={todo.isCompleted} onChange={() => handleCheckboxClick(index)}/>
+              <input type="checkbox" checked={todo.isCompleted} onChange={() => handleCheckboxClick(index, todo.id)}/>
               <span className='todo-span'>{todo.todo}</span>
             </label>
             <button data-testid="modify-button">수정</button>
             <button data-testid="delete-button"
-              onClick={() => handleDeleteClick(index)}
+              onClick={() => handleDeleteClick(index, todo.id)}
             >삭제</button>
           </div>
         ))}
