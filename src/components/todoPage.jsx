@@ -160,7 +160,7 @@ function TodoPage() {
         {todos.map((todo, index) => (
           <div key={index}>
             {isEditing === index ? (
-              <div>
+              <li>
                 <label>
                   <input type="checkbox" checked={todo.isCompleted} onChange={() => handleCheckboxClick(index, todo.id)}/>
                   <input
@@ -172,16 +172,16 @@ function TodoPage() {
                   ></input>
                 </label>
                 <button 
-                  data-testid="modify-button"
+                  data-testid="submit-button"
                   onClick={() => handleEditSubmit(index, todo.id)}  
                 >제출</button>
                 <button 
-                  data-testid="delete-button"
+                  data-testid="cancel-button"
                   onClick={() => setIsEditing(-1)}
                 >취소</button>
-              </div>
+              </li>
             ) : (
-              <div>
+              <li>
                 <label>
                   <input type="checkbox" checked={todo.isCompleted} onChange={() => handleCheckboxClick(index, todo.id)}/>
                   <span className='todo-span'>{todo.todo}</span>
@@ -193,7 +193,7 @@ function TodoPage() {
                 <button data-testid="delete-button"
                   onClick={() => handleDeleteClick(index, todo.id)}
                 >삭제</button>
-              </div>
+              </li>
             )}
           </div>
         ))}
